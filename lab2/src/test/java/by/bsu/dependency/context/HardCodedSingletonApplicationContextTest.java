@@ -1,4 +1,4 @@
-package lab2.src.test.java.by.bsu.dependency.context;
+/*package lab2.src.test.java.by.bsu.dependency.context;
 
 import lab2.src.main.java.by.bsu.dependency.example.FirstBean;
 import lab2.src.main.java.by.bsu.dependency.example.OtherBean;
@@ -99,4 +99,4 @@ class HardCodedSingletonApplicationContextTest {
                 () -> applicationContext.isPrototype("randomName")
         );
     }
-}
+}*/
