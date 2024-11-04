@@ -1,6 +1,7 @@
 package lab2.src.main.java.by.bsu.dependency.context;
 
 public class SimpleApplicationContext extends AbstractApplicationContext {
+
     /**
      * Создает контекст, содержащий классы, переданные в параметре.
      * <br/>
