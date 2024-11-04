@@ -1,4 +1,4 @@
-package by.bsu.dependency.context;
+package lab-2.src.context.HardCodedSingletonApplicationContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import by.bsu.dependency.annotation.Bean;
 
 
-public class HardCodedSingletonApplicationContext extends AbstractApplicationContext {
+public class HardCodedSingletonApplicationContext extends by.bsu.dependency.context.AbstractApplicationContext {
 
     private final Map<String, Class<?>> beanDefinitions;
     private final Map<String, Object> beans = new HashMap<>();
