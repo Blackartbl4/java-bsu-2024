@@ -49,8 +49,7 @@ public class TestMain {
     static Map<String, Quiz> getQuizMap() {
         Map<String, Quiz> map = new HashMap<>();
         {
-            EnumSet<Operation> set = EnumSet.allOf(Operation.class);
-            AbstractMathTaskGenerator.Config config = new AbstractMathTaskGenerator.Config(1, 20, (EnumSet<Operation>) set);
+            AbstractMathTaskGenerator.Config config = new AbstractMathTaskGenerator.Config(1, 20, EnumSet.allOf(Operation.class));
             ExpressionTaskGenerator taco4ku = new ExpressionTaskGenerator(config);
             Quiz quiz1 = new Quiz(taco4ku, 5);
             map.put("ExpressionTaskGenerator", quiz1);
