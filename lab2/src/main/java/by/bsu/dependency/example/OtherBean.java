@@ -19,7 +19,7 @@ public class OtherBean {
         firstBean.doSomething();
     }
 
-    @PostConstruct
+    // @PostConstruct
     void postConstructor() {
         System.out.println("Constructor");
         System.out.println("Trying to shake first bean...");
