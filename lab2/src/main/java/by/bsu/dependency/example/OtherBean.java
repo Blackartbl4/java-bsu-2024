@@ -1,10 +1,11 @@
 package lab2.src.main.java.by.bsu.dependency.example;
 
 import lab2.src.main.java.by.bsu.dependency.annotation.Bean;
+import lab2.src.main.java.by.bsu.dependency.annotation.BeanScope;
 import lab2.src.main.java.by.bsu.dependency.annotation.Inject;
 import lab2.src.main.java.by.bsu.dependency.annotation.PostConstruct;
 
-@Bean(name = "otherBean")
+@Bean(name = "otherBean", scope = BeanScope.PROTOTYPE)
 public class OtherBean {
 
     @Inject
