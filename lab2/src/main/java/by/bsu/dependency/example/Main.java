@@ -6,7 +6,7 @@ import lab2.src.main.java.by.bsu.dependency.context.HardCodedSingletonApplicatio
 public class Main {
 
     public static void main(String[] args) {
-        ApplicationContext applicationContext = new HardCodedSingletonApplicationContext(
+        /*ApplicationContext applicationContext = new HardCodedSingletonApplicationContext(
                 FirstBean.class, OtherBean.class
         );
         applicationContext.start();
@@ -17,7 +17,7 @@ public class Main {
         firstBean.doSomething();
         otherBean.doSomething();
 
-        otherBean.doSomethingWithFirst();
+        otherBean.doSomethingWithFirst();*/
 
         // Метод падает, так как в классе HardCodedSingletonApplicationContext не реализовано внедрение зависимостей
         // otherBean.doSomethingWithFirst();

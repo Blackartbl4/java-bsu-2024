@@ -4,6 +4,7 @@ import lab2.src.main.java.by.bsu.dependency.annotation.Bean;
 import lab2.src.main.java.by.bsu.dependency.annotation.BeanScope;
 import lab2.src.main.java.by.bsu.dependency.annotation.Inject;
 import lab2.src.main.java.by.bsu.dependency.annotation.PostConstruct;
+import lab2.src.main.java.by.bsu.dependency.exceptions.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -15,7 +16,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
             if (scope == BeanScope.SINGLETON)
                 this.InstantiatedBeans_.put(type, Instantiate_(type));
         });
-        this.InstantiatedBeans_.forEach((_, obj) -> PostConstruct_(Inject_(obj)));
+        this.InstantiatedBeans_.forEach((idea, obj) -> PostConstruct_(Inject_(obj)));
         Status_ = ContextStatus.STARTED;
     }
 
@@ -26,26 +27,33 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     @Override
     public boolean containsBean(String name) {
+        AssertRunning_();
         return BeanTemplates_.containsKey(name);
     }
 
     @Override
     public Object getBean(String name) {
+        AssertRunning_();
+        CheckBeanCorrectness_(name);
         return GetBean(GetBeanType(name));
     }
 
     @Override
     public <T> T getBean(Class<T> clazz) {
+        AssertRunning_();
+        CheckBeanCorrectness_(clazz);
         return (T)GetBean(clazz);
     }
 
     @Override
     public boolean isSingleton(String name) {
+        CheckBeanCorrectness_(name);
         return GetBeanScope(GetBeanType(name)) == BeanScope.SINGLETON;
     }
 
     @Override
     public boolean isPrototype(String name) {
+        CheckBeanCorrectness_(name);
         return GetBeanScope(GetBeanType(name)) == BeanScope.PROTOTYPE;
     }
 
@@ -53,17 +61,17 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     private final HashMap<Class<?>, BeanScope> ClassedBeans_ = new HashMap<>();
     private final HashMap<Class<?>, Object> InstantiatedBeans_ = new HashMap<>();
 
-    private static class BeanHelper {
+    public static class BeanHelper {
         public record BeanValue(String name, Class<?> type, BeanScope scope){};
 
-        private static String CombineName(Class<?> type) {
-            return type.getName().substring(0,0).toLowerCase() + type.getName().substring(1);
+        public static String CombineName(Class<?> type) {
+            return Character.toLowerCase(type.getSimpleName().charAt(0)) + type.getSimpleName().substring(1);
         }
 
         public static BeanValue GetBin(Class<?> type) {
             var annot = type.getAnnotation(Bean.class);
             return new BeanValue(
-                    annot == null ? CombineName(type) : annot.name(),
+                    annot == null || annot.name().isEmpty() ? CombineName(type) : annot.name(),
                     type,
                     annot == null ? BeanScope.SINGLETON : annot.scope()
             );
@@ -83,12 +91,15 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     private void CheckBeanCorrectness_(Class<?> type) {
         if (!ClassedBeans_.containsKey(type))
-            throw new RuntimeException();
+            throw new ApplicationContextDoNotContainsSuchBeanDefinitionException(BeanHelper.CombineName(type));
+    }
+
+    private void CheckBeanCorrectness_(String name) {
+        if (!BeanTemplates_.containsKey(name))
+            throw new ApplicationContextDoNotContainsSuchBeanDefinitionException(name);
     }
 
     private Object GetBean(Class<?> type) {
-        CheckBeanCorrectness_(type);
-
         if (GetBeanScope(type) == BeanScope.SINGLETON)
             return InstantiatedBeans_.get(type);
         return PostConstruct_(Inject_(Instantiate_(type)));
@@ -102,7 +113,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
                     try {
                         method.invoke(obj);
                     } catch (InvocationTargetException | IllegalAccessException e) {
-                        throw new RuntimeException(e);
+                        throw new ApplicationContextPostConstructFailure(method.getName(), e);
                     }
                 });
         return obj;
@@ -113,9 +124,12 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
                 .filter(fld->fld.isAnnotationPresent(Inject.class))
                 .forEach(fld -> {
                     fld.setAccessible(true);
+                    CheckBeanCorrectness_(fld.getType());
                     try {
                         fld.set(obj, GetBean(fld.getType()));
-                    } catch (IllegalAccessException ex) { throw new RuntimeException(ex); }
+                    } catch (IllegalAccessException ex) {
+                        throw new ApplicationContextInjectFailure(fld.getName(), ex);
+                    }
                 });
         return obj;
     }
@@ -125,13 +139,18 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
             return type.getDeclaredConstructor(new Class[]{}).newInstance();
         } catch (NoSuchMethodException | InvocationTargetException |
                  InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new ApplicationContextInstantiateFailure(type.getName(), e);
         }
     }
 
     protected enum ContextStatus {
         NOT_STARTED,
         STARTED
+    }
+
+    private void AssertRunning_() {
+        if (!isRunning())
+            throw new ApplicationContextNotStartedException();
     }
 
     private ContextStatus Status_ = ContextStatus.NOT_STARTED;

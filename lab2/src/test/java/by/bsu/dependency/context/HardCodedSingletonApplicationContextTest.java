@@ -1,7 +1,10 @@
-/*package lab2.src.test.java.by.bsu.dependency.context;
+package lab2.src.test.java.by.bsu.dependency.context;
 
-import lab2.src.main.java.by.bsu.dependency.example.FirstBean;
-import lab2.src.main.java.by.bsu.dependency.example.OtherBean;
+import lab2.src.main.java.by.bsu.dependency.example.*;
+import lab2.src.main.java.by.bsu.dependency.context.*;
+import lab2.src.main.java.by.bsu.dependency.annotation.*;
+import lab2.src.main.java.by.bsu.dependency.exceptions.ApplicationContextDoNotContainsSuchBeanDefinitionException;
+import lab2.src.main.java.by.bsu.dependency.exceptions.ApplicationContextNotStartedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +17,11 @@ class HardCodedSingletonApplicationContextTest {
 
     @BeforeEach
     void init() {
-        applicationContext = new HardCodedSingletonApplicationContext(FirstBean.class, OtherBean.class);
+        applicationContext = new HardCodedSingletonApplicationContext(
+                FirstBean.class,
+                OtherBean.class,
+                SingletonPostConstructCheck.class,
+                PrototypePostConstructCheck.class);
     }
 
     @Test
@@ -27,8 +34,7 @@ class HardCodedSingletonApplicationContextTest {
     @Test
     void testContextContainsNotStarted() {
         assertThrows(
-                // TODO: уточнить класс исключения (ApplicationContextNotStartedException)
-                RuntimeException.class,
+                ApplicationContextNotStartedException.class,
                 () -> applicationContext.containsBean("firstBean")
         );
     }
@@ -45,8 +51,7 @@ class HardCodedSingletonApplicationContextTest {
     @Test
     void testContextGetBeanNotStarted() {
         assertThrows(
-                // TODO: уточнить класс исключения (ApplicationContextNotStartedException)
-                RuntimeException.class,
+                ApplicationContextNotStartedException.class,
                 () -> applicationContext.getBean("firstBean")
         );
     }
@@ -64,8 +69,7 @@ class HardCodedSingletonApplicationContextTest {
         applicationContext.start();
 
         assertThrows(
-                // TODO: уточнить класс исключения (NoSuchBeanDefinitionException)
-                RuntimeException.class,
+                ApplicationContextDoNotContainsSuchBeanDefinitionException.class,
                 () -> applicationContext.getBean("randomName")
         );
     }
@@ -73,14 +77,13 @@ class HardCodedSingletonApplicationContextTest {
     @Test
     void testIsSingletonReturns() {
         assertThat(applicationContext.isSingleton("firstBean")).isTrue();
-        assertThat(applicationContext.isSingleton("otherBean")).isTrue();
+        assertThat(applicationContext.isSingleton("otherBean")).isFalse();
     }
 
     @Test
     void testIsSingletonThrows() {
         assertThrows(
-                // TODO: уточнить класс исключения (NoSuchBeanDefinitionException)
-                RuntimeException.class,
+                ApplicationContextDoNotContainsSuchBeanDefinitionException.class,
                 () -> applicationContext.isSingleton("randomName")
         );
     }
@@ -88,15 +91,30 @@ class HardCodedSingletonApplicationContextTest {
     @Test
     void testIsPrototypeReturns() {
         assertThat(applicationContext.isPrototype("firstBean")).isFalse();
-        assertThat(applicationContext.isPrototype("otherBean")).isFalse();
+        assertThat(applicationContext.isPrototype("otherBean")).isTrue();
     }
 
     @Test
     void testIsPrototypeThrows() {
         assertThrows(
-                // TODO: уточнить класс исключения (NoSuchBeanDefinitionException)
-                RuntimeException.class,
+                ApplicationContextDoNotContainsSuchBeanDefinitionException.class,
                 () -> applicationContext.isPrototype("randomName")
         );
     }
-}*/
+
+    @Test
+    void testIsSingletonPrototypeReturnsCorrect() {
+        applicationContext.start();
+
+        assertThat(applicationContext.getBean("firstBean") == applicationContext.getBean("firstBean")).isTrue();
+        assertThat(applicationContext.getBean("otherBean") == applicationContext.getBean("otherBean")).isFalse();
+    }
+
+    @Test
+    void testIsConstructsCorrect() {
+        applicationContext.start();
+
+        assertThat(((PrototypePostConstructCheck)applicationContext.getBean("PCCP")).IsConstructed).isTrue();
+        assertThat(((SingletonPostConstructCheck)applicationContext.getBean("PCCS")).IsConstructed).isTrue();
+    }
+}
