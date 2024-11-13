@@ -10,9 +10,55 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public abstract class AbstractApplicationContext implements ApplicationContext {
+    protected class DepsChecker {
+        public Class<?> Owned;
+        public DepsChecker Parent;
+
+        public DepsChecker(Class<?> a, DepsChecker p) {
+            Owned = a;
+            Parent = p;
+        }
+
+        public DepsChecker(Class<?> a) {
+            Owned = a;
+            Parent = null;
+        }
+
+        void Check() {
+            Arrays.stream(Owned.getDeclaredFields())
+                .filter(fld -> fld.isAnnotationPresent(Inject.class))
+                .peek(fld -> {
+                    if (!ClassedBeans_.containsKey(fld.getType()))
+                        throw new ApplicationContextDoNotContainsSuchBeanDefinitionException(BeanHelper.CombineName(fld.getType()));
+                })
+                .filter(fld -> ClassedBeans_.get(fld.getType()) == BeanScope.PROTOTYPE)
+                .forEach(fld -> {
+                    if (IsVisited(fld.getType()))
+                        throw new ApplicationContextRecursiveDependencyException(CheckedType(), fld.getType());
+
+                    new DepsChecker(fld.getType(), this).Check();
+                });
+        }
+
+        boolean IsVisited(Class<?> type) {
+            return Owned == type || (Parent != null && Parent.IsVisited(type));
+        }
+
+        Class<?> CheckedType() {
+            if (Parent == null)
+                return Owned;
+
+            return Parent.CheckedType();
+        }
+    }
+
     @Override
     public void start() {
+
+
         this.ClassedBeans_.forEach((type, scope) -> {
+            if (scope == BeanScope.PROTOTYPE)
+                (new DepsChecker(type)).Check();
             if (scope == BeanScope.SINGLETON)
                 this.InstantiatedBeans_.put(type, Instantiate_(type));
         });
