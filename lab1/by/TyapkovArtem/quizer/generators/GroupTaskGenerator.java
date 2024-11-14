@@ -41,7 +41,7 @@ public class GroupTaskGenerator implements TaskGenerator {
             try {
                 TaskGenerator curgen = vec_.get(b);
                 return curgen.generate();
-            } catch (RuntimeException _) {
+            } catch (RuntimeException ignored) {
             }
         }
         throw new GroupTaskGenException("xpeHb kakaR To");
