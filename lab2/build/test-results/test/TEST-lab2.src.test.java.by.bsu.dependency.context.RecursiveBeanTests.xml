@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="lab2.src.test.java.by.bsu.dependency.context.RecursiveBeanTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2024-11-13T08:01:02" hostname="WIN-OMPGCJSVMQM" time="0.025">
+  <properties/>
+  <testcase name="fallOnSimpleRecursion()" classname="lab2.src.test.java.by.bsu.dependency.context.RecursiveBeanTests" time="0.008"/>
+  <testcase name="noFallOnMuchInstances()" classname="lab2.src.test.java.by.bsu.dependency.context.RecursiveBeanTests" time="0.009"/>
+  <testcase name="fallOnIndirectRecursion()" classname="lab2.src.test.java.by.bsu.dependency.context.RecursiveBeanTests" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,13 +1,14 @@
-package labb2.src.test.java.by.bsu.dependency.context;
+package by.bsu.dependency.context;
 
-import labb2.src.main.java.by.bsu.dependency.example.*;
-import labb2.src.main.java.by.bsu.dependency.context.*;
-import labb2.src.main.java.by.bsu.dependency.exceptions.*;
-import labb2.src.main.java.by.bsu.dependency.annotation.*;
+import by.bsu.dependency.example.*;
+import by.bsu.dependency.context.*;
+import by.bsu.dependency.exceptions.*;
+import by.bsu.dependency.annotation.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class HardCodedSingletonApplicationContextTest {
@@ -16,7 +17,7 @@ class HardCodedSingletonApplicationContextTest {
 
     @BeforeEach
     void init() {
-        applicationContext = new HardCodedSingletonApplicationContext(FirstBean.class, OtherBean.class);
+        applicationContext = new HardCodedSingletonApplicationContext(ABean.class, BBean.class, CBean.class, DBean.class, FirstBean.class, OtherBean.class);
     }
 
     @Test
@@ -29,8 +30,7 @@ class HardCodedSingletonApplicationContextTest {
     @Test
     void testContextContainsNotStarted() {
         assertThrows(
-                // TODO: уточнить класс исключения (ApplicationContextNotStartedException)
-                RuntimeException.class,
+                ApplicationContextNotStartedException.class,
                 () -> applicationContext.containsBean("firstBean")
         );
     }
@@ -47,8 +47,7 @@ class HardCodedSingletonApplicationContextTest {
     @Test
     void testContextGetBeanNotStarted() {
         assertThrows(
-                // TODO: уточнить класс исключения (ApplicationContextNotStartedException)
-                RuntimeException.class,
+                ApplicationContextNotStartedException.class,
                 () -> applicationContext.getBean("firstBean")
         );
     }
@@ -66,8 +65,7 @@ class HardCodedSingletonApplicationContextTest {
         applicationContext.start();
 
         assertThrows(
-                // TODO: уточнить класс исключения (NoSuchBeanDefinitionException)
-                RuntimeException.class,
+                NoSuchBeanDefinitionException.class,
                 () -> applicationContext.getBean("randomName")
         );
     }
@@ -81,8 +79,7 @@ class HardCodedSingletonApplicationContextTest {
     @Test
     void testIsSingletonThrows() {
         assertThrows(
-                // TODO: уточнить класс исключения (NoSuchBeanDefinitionException)
-                RuntimeException.class,
+                NoSuchBeanDefinitionException.class,
                 () -> applicationContext.isSingleton("randomName")
         );
     }
@@ -96,9 +93,30 @@ class HardCodedSingletonApplicationContextTest {
     @Test
     void testIsPrototypeThrows() {
         assertThrows(
-                // TODO: уточнить класс исключения (NoSuchBeanDefinitionException)
-                RuntimeException.class,
+                NoSuchBeanDefinitionException.class,
                 () -> applicationContext.isPrototype("randomName")
         );
+    }
+
+    @Test
+    void testDepencies() {
+        applicationContext.start();
+        assertThat(applicationContext.containsBean("bBean")).isTrue();
+        assertThat(applicationContext.containsBean("aBean")).isTrue();
+        assertThat(applicationContext.isPrototype("bBean")).isTrue();
+        assertThat(applicationContext.isPrototype("cBean")).isTrue();
+        assertThat(applicationContext.getBean("cBean")).isNotNull().isInstanceOf(CBean.class);
+        ABean a1 = applicationContext.getBean(ABean.class);
+        DBean d1 = applicationContext.getBean(DBean.class);
+        assertThat(a1 == d1.a).isTrue();
+        DBean d2 = applicationContext.getBean(DBean.class);
+        assertThat(d2 == d1).isFalse();
+    }
+
+    @Test
+    void testPostconstruct(){
+        applicationContext.start();
+        ABean a1 = (ABean) applicationContext.getBean("aBean");
+        assertEquals(a1.a, 5);
     }
 }

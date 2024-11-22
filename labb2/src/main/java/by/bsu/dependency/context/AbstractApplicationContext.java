@@ -1,44 +1,86 @@
-package labb2.src.main.java.by.bsu.dependency.context;
+package by.bsu.dependency.context;
 
-import labb2.src.main.java.by.bsu.dependency.annotation.Bean;
-import labb2.src.main.java.by.bsu.dependency.annotation.BeanScope;
-import labb2.src.main.java.by.bsu.dependency.annotation.Inject;
-import labb2.src.main.java.by.bsu.dependency.exceptions.ApplicationContextNotStartedException;
-import labb2.src.main.java.by.bsu.dependency.exceptions.NoSuchBeanDefinitionException;
+import by.bsu.dependency.annotation.Bean;
+import by.bsu.dependency.annotation.BeanScope;
+import by.bsu.dependency.annotation.Inject;
+import by.bsu.dependency.annotation.PostConstruct;
+import by.bsu.dependency.exceptions.*;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public abstract class AbstractApplicationContext implements ApplicationContext {
-    private Map<String, Class<?>> MapStrCla = new HashMap<String, Class<?>>();
-    private Map<Class<?>, Object> MapClaObj = new HashMap<>();
-    private Map<Class<?>, BeanScope> MapClaSco = new HashMap<>();
-    private Set<Map<Class<?>, Set<Class<?>>>> pizdec = new HashSet<>();
+    private final Map<String, Class<?>> MapStrCla = new HashMap<String, Class<?>>();
+    private final Map<Class<?>, Object> MapClaObj = new HashMap<>();
+    private final Map<Class<?>, BeanScope> MapClaSco = new HashMap<>();
+    private final Map<Class<?>, Set<Class<?>>> BeanDependencies = new HashMap<>();
     private ContextStatus contextStatus_ = ContextStatus.NOT_STARTED;
+
+    protected void PostConstruct(Class<?> clazz, Object bean) {
+        Method[] methods = clazz.getDeclaredMethods();
+        for (var method : methods) {
+            try {
+                method.setAccessible(true);
+                if (method.isAnnotationPresent(PostConstruct.class)) {
+                    method.invoke(bean);
+                }
+            }
+            catch (IllegalAccessException | InvocationTargetException ex)  {
+                throw new PostConstructException(ex);
+            }
+        }
+    }
+
+    protected void CheckForCycleDependencies(Class<?> depSource, Class<?> target) {
+        if (BeanDependencies.containsKey(depSource)) {
+            for (var injectedClass : BeanDependencies.get(depSource)) {
+                if (MapClaSco.get(injectedClass) == BeanScope.SINGLETON) continue;;
+                BeanDependencies.get(target).add(injectedClass);
+                Set<?> set = BeanDependencies.get(injectedClass);
+                if (BeanDependencies.containsKey(injectedClass) && BeanDependencies.get(injectedClass).contains(target))
+                    throw new CycleDependencyException("Cycle dependency!");
+                CheckForCycleDependencies(injectedClass, target);
+            }
+        }
+    }
+
+    protected void InjectDependencies(Class<?> clazz, Object beanObject) {
+        try {
+            for (var field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                if (field.isAnnotationPresent(Inject.class)) {
+                    if (!BeanDependencies.containsKey(clazz)) {
+                        Set<Class<?>> clazzDependencies = new HashSet<>();
+                        BeanDependencies.put(clazz, clazzDependencies);
+                        if (MapClaSco.get(clazz) == BeanScope.PROTOTYPE && MapClaSco.get(field.getType()) == BeanScope.PROTOTYPE) clazzDependencies.add(field.getType());
+                    } else if (MapClaSco.get(clazz) == BeanScope.PROTOTYPE && MapClaSco.get(field.getType()) == BeanScope.PROTOTYPE) {
+                        BeanDependencies.get(clazz).add(field.getType());
+                    }
+                    if (MapClaSco.get(field.getType()) == BeanScope.PROTOTYPE) {
+                        CheckForCycleDependencies(field.getType(), field.getType());
+                    }
+
+                    if (MapClaSco.get(field.getType()) == BeanScope.SINGLETON) {
+                        field.set(beanObject, MapClaObj.get(field.getType()));
+                    } else {
+                        field.set(beanObject, BeanConstructor(field.getType()));
+                    }
+                }
+            }
+        } catch (IllegalAccessException ex) {
+            throw new InjectException(ex);
+        }
+    }
 
     protected Object BeanConstructor(Class<?> clazz) {
         try {
             Constructor<?> constructor = clazz.getConstructor();
             constructor.setAccessible(true);
             Object beanObject = constructor.newInstance();
-            Field fields[] = clazz.getDeclaredFields();
-            for (var field : fields) {
-                field.setAccessible(true);
-
-                if (field.getAnnotation(Inject.class) != null ) {
-                    if (field.getClass().getAnnotation(Bean.class) != null) {
-                        if (MapClaSco.get(field.getClass()) == BeanScope.SINGLETON) {
-                            field.set(MapClaObj.get(clazz), MapClaObj.get(field.getClass()));
-                        } else {
-                            field.set(MapClaObj.get(clazz), BeanConstructor(field.getClass()));
-                        }
-                    } else if (MapClaSco.get(field.getClass()) == BeanScope.SINGLETON) {
-                        field.set(MapClaObj.get(clazz), MapClaObj.get(field.getClass()));
-                    }
-                }
-            }
+            InjectDependencies(clazz, beanObject);
+            PostConstruct(clazz, beanObject);
             return beanObject;
         } catch (InvocationTargetException | NoSuchMethodException | InstantiationException |
                 IllegalAccessException ig) {
@@ -46,17 +88,20 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         }
     }
 
-    protected void ConstructorHelper(Class<?> clazz) {
-        if (clazz.getAnnotation(Bean.class) != null) {
-            if (clazz.getAnnotation(Bean.class).name().isEmpty()) {
+    protected void AddingClassesToMapByName(Class<?> clazz) {
+        if (clazz.getDeclaredAnnotation(Bean.class) != null) {
+            if (clazz.getDeclaredAnnotation(Bean.class).name().isEmpty()) {
                 String name = clazz.getSimpleName();
-                String str = name.substring(0, 2).toLowerCase() + name.substring(2);
+                String str = name.substring(0, 1).toLowerCase() + name.substring(1);
                 MapStrCla.put(str, clazz);
-                MapClaSco.put(clazz, clazz.getAnnotation(Bean.class).scope());
-            } else MapStrCla.put(clazz.getAnnotation(Bean.class).name(), clazz);
+                MapClaSco.put(clazz, clazz.getDeclaredAnnotation(Bean.class).scope());
+            } else {
+                MapStrCla.put(clazz.getDeclaredAnnotation(Bean.class).name(), clazz);
+                MapClaSco.put(clazz, clazz.getDeclaredAnnotation(Bean.class).scope());
+            }
         } else {
             String name = clazz.getSimpleName();
-            String str = name.substring(0, 2).toLowerCase() + name.substring(2);
+            String str = name.substring(0, 1).toLowerCase() + name.substring(1);
             MapStrCla.put(str, clazz);
             MapClaSco.put(clazz, BeanScope.SINGLETON);
         }
@@ -65,9 +110,10 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     @Override
     public void start() {
         if (contextStatus_ == ContextStatus.STARTED) return;
+
         for (var name : MapStrCla.entrySet()) {
             Class<?> clazz = name.getValue();
-            try {
+            if (MapClaSco.get(clazz) == BeanScope.SINGLETON) try {
                 Constructor<?> constructor = clazz.getConstructor();
                 constructor.setAccessible(true);
                 Object beanObject = constructor.newInstance();
@@ -79,9 +125,8 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         }
         for (var i : MapClaObj.entrySet()) {
             Class<?> clazz = i.getKey();
-            if (MapClaSco.get(clazz) == BeanScope.SINGLETON) {
-                BeanConstructor(clazz);
-            }
+            InjectDependencies(clazz, MapClaObj.get(clazz));
+            PostConstruct(clazz, MapClaObj.get(clazz));
         }
         contextStatus_ = ContextStatus.STARTED;
     }
@@ -101,17 +146,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     @Override
     public Object getBean(String name) {
-        if (contextStatus_ == ContextStatus.NOT_STARTED) {
-            throw new ApplicationContextNotStartedException("ContainsBean failed.");
-        }
-        if (!containsBean(name)) throw new NoSuchBeanDefinitionException("No such bean.");
-        if (MapClaSco.get(MapStrCla.get(name)) == BeanScope.SINGLETON) {
-            return MapClaObj.get(MapStrCla.get(name));
-        }
-        else if (MapClaSco.get(MapStrCla.get(name)) == BeanScope.PROTOTYPE){
-            return BeanConstructor(MapStrCla.get(name));
-        }
-        return null;
+        return (Object) getBean(MapStrCla.get(name));
     }
 
     @Override
@@ -128,9 +163,12 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     @Override
     public <T> T getBean(Class<T> clazz) {
-        if (contextStatus_ == ContextStatus.NOT_STARTED)
+        if (contextStatus_ == ContextStatus.NOT_STARTED) {
             throw new ApplicationContextNotStartedException("ContainsBean failed.");
-        if (!MapClaObj.containsKey(clazz)) throw new NoSuchBeanDefinitionException("No such bean.");
+        }
+        if (!MapStrCla.containsValue(clazz)) {
+            throw new NoSuchBeanDefinitionException("No such bean.");
+        }
         if (MapClaSco.get(clazz) == BeanScope.SINGLETON) {
             return (T) MapClaObj.get(clazz);
         } else {

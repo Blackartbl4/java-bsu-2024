@@ -1,6 +1,12 @@
-package labb2.src.main.java.by.bsu.dependency.context;
+package by.bsu.dependency.context;
 
-public abstract class AutoScanApplicationContext extends AbstractApplicationContext {
+import by.bsu.dependency.annotation.Bean;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+
+import java.util.Set;
+
+public class AutoScanApplicationContext extends AbstractApplicationContext {
 
     /**
      * Создает контекст, содержащий классы из пакета {@code packageName}, помеченные аннотацией {@code @Bean}.
@@ -12,41 +18,7 @@ public abstract class AutoScanApplicationContext extends AbstractApplicationCont
      * @param packageName имя сканируемого пакета
      */
     public AutoScanApplicationContext(String packageName) {
-        throw new IllegalStateException("not implemented");
-    }
-
-    @Override
-    public void start() {
-        throw new IllegalStateException("not implemented");
-    }
-
-    @Override
-    public boolean isRunning() {
-        throw new IllegalStateException("not implemented");
-    }
-
-    @Override
-    public boolean containsBean(String name) {
-        throw new IllegalStateException("not implemented");
-    }
-
-    @Override
-    public Object getBean(String name) {
-        throw new IllegalStateException("not implemented");
-    }
-
-    @Override
-    public <T> T getBean(Class<T> clazz) {
-        throw new IllegalStateException("not implemented");
-    }
-
-    @Override
-    public boolean isPrototype(String name) {
-        throw new IllegalStateException("not implemented");
-    }
-
-    @Override
-    public boolean isSingleton(String name) {
-        throw new IllegalStateException("not implemented");
+        Reflections reflections = new Reflections(packageName, new SubTypesScanner(false));
+        reflections.getSubTypesOf(Object.class).stream().filter(a -> a.isAnnotationPresent(Bean.class)).forEach(this::AddingClassesToMapByName);
     }
 }

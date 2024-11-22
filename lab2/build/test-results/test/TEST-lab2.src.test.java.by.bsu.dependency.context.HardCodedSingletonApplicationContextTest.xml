@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="lab2.src.test.java.by.bsu.dependency.context.HardCodedSingletonApplicationContextTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2024-11-13T08:01:02" hostname="WIN-OMPGCJSVMQM" time="0.022">
+  <properties/>
+  <testcase name="testContextContainsBeans()" classname="lab2.src.test.java.by.bsu.dependency.context.HardCodedSingletonApplicationContextTest" time="0.005"/>
+  <testcase name="testIsPrototypeThrows()" classname="lab2.src.test.java.by.bsu.dependency.context.HardCodedSingletonApplicationContextTest" time="0.001"/>
+  <testcase name="testIsSingletonPrototypeReturnsCorrect()" classname="lab2.src.test.java.by.bsu.dependency.context.HardCodedSingletonApplicationContextTest" time="0.002"/>
+  <testcase name="testIsSingletonReturns()" classname="lab2.src.test.java.by.bsu.dependency.context.HardCodedSingletonApplicationContextTest" time="0.0"/>
+  <testcase name="testIsConstructsCorrect()" classname="lab2.src.test.java.by.bsu.dependency.context.HardCodedSingletonApplicationContextTest" time="0.001"/>
+  <testcase name="testIsPrototypeReturns()" classname="lab2.src.test.java.by.bsu.dependency.context.HardCodedSingletonApplicationContextTest" time="0.001"/>
+  <testcase name="testIsSingletonThrows()" classname="lab2.src.test.java.by.bsu.dependency.context.HardCodedSingletonApplicationContextTest" time="0.001"/>
+  <testcase name="testContextGetBeanNotStarted()" classname="lab2.src.test.java.by.bsu.dependency.context.HardCodedSingletonApplicationContextTest" time="0.001"/>
+  <testcase name="testGetBeanThrows()" classname="lab2.src.test.java.by.bsu.dependency.context.HardCodedSingletonApplicationContextTest" time="0.0"/>
+  <testcase name="testContextContainsNotStarted()" classname="lab2.src.test.java.by.bsu.dependency.context.HardCodedSingletonApplicationContextTest" time="0.001"/>
+  <testcase name="testIsRunning()" classname="lab2.src.test.java.by.bsu.dependency.context.HardCodedSingletonApplicationContextTest" time="0.0"/>
+  <testcase name="testGetBeanReturns()" classname="lab2.src.test.java.by.bsu.dependency.context.HardCodedSingletonApplicationContextTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

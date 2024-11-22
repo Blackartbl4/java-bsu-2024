@@ -1,6 +1,4 @@
-package labb2.src.main.java.by.bsu.dependency.context;
-
-import labb2.src.main.java.by.bsu.dependency.annotation.Bean;
+package by.bsu.dependency.context;
 
 public class SimpleApplicationContext extends AbstractApplicationContext {
 
@@ -16,7 +14,7 @@ public class SimpleApplicationContext extends AbstractApplicationContext {
      */
     public SimpleApplicationContext(Class<?>... beanClasses) {
             for (var beanClass : beanClasses) {
-                ConstructorHelper(beanClass);
+                AddingClassesToMapByName(beanClass);
             }
     }
 }

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c4122727-ed6f-458e-bc22-8175414dc7f5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lab2/src/main/java/by/bsu/dependency/context/AbstractApplicationContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/../lab2/src/main/java/by/bsu/dependency/context/AbstractApplicationContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lab2/src/main/java/by/bsu/dependency/context/HardCodedSingletonApplicationContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/../lab2/src/main/java/by/bsu/dependency/context/HardCodedSingletonApplicationContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lab2/src/main/java/by/bsu/dependency/example/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/../lab2/src/main/java/by/bsu/dependency/example/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lab2/src/test/java/by/bsu/dependency/context/HardCodedSingletonApplicationContextTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../lab2/src/test/java/by/bsu/dependency/context/HardCodedSingletonApplicationContextTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../out/production/java-bsu-2024/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../out/production/java-bsu-2024/.idea/misc.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Blackartbl4"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Blackartbl4/java-bsu-2024.git",
+    "accountId": "0a55f049-ac80-4ba4-a05d-30a50808c5cf"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 5
+}]]></component>
+  <component name="ProjectId" id="2oTEK60I4kzwDd6vjHSNXbk9gmv" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "sample",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/User/IdeaProjects/java-bsu-2024/controlWork"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c4122727-ed6f-458e-bc22-8175414dc7f5" name="Changes" comment="" />
+      <created>1730885098445</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1730885098445</updated>
+    </task>
+    <servers />
+  </component>
+</project>

@@ -1,7 +1,7 @@
-package labb2.src.main.java.by.bsu.dependency.example;
+package by.bsu.dependency.example;
 
-import labb2.src.main.java.by.bsu.dependency.annotation.Bean;
-import labb2.src.main.java.by.bsu.dependency.annotation.Inject;
+import by.bsu.dependency.annotation.Bean;
+import by.bsu.dependency.annotation.Inject;
 
 @Bean(name = "otherBean")
 public class OtherBean {

@@ -1,6 +1,6 @@
-package labb2.src.main.java.by.bsu.dependency.context;
+package by.bsu.dependency.context;
 
-import labb2.src.main.java.by.bsu.dependency.annotation.Bean;
+import by.bsu.dependency.annotation.Bean;
 
 public interface ApplicationContext {
 

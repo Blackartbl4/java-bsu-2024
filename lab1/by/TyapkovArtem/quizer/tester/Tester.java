@@ -128,7 +128,7 @@ public class Tester {
             tester.RunTestGroup(tstr -> {
                         try {
                             method.invoke(null, tstr);
-                        } catch (InvocationTargetException | IllegalAccessException _) {}
+                        } catch (InvocationTargetException | IllegalAccessException e) {}
                     },
                     gr.Name());
         }

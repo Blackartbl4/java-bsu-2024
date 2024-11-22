@@ -1,4 +1,4 @@
-package labb2.src.main.java.by.bsu.dependency.annotation;
+package by.bsu.dependency.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
